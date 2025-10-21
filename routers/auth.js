@@ -1,5 +1,5 @@
 import { register, login } from '../controllers/user.js'
-import { mapUser } from '../helpers'
+import { mapUser } from '../helpers/index.js'
 import express from 'express'
 
 export const authRouter = express.Router({ mergeParams: true })

@@ -1,5 +1,5 @@
-import { verify } from "jsonwebtoken"
-import { User } from "../models"
+import { verify } from "../helpers/index.js"
+import { User } from "../models/index.js"
 
 export const authenticated = async(req, res, next) => {
     const tokenData = verify(req.cookies.token)

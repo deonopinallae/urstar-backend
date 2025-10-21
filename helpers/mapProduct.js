@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { mapReview } from './mapReview'
+import { mapReview } from './mapReview.js'
 
 export const mapProduct = (product) => {
 	const reviewsToMap = product.reviews || []
@@ -8,8 +8,9 @@ export const mapProduct = (product) => {
 		title: product.title,
 		brand: product.brand,
 		type: product.type,
+		category: product.category,
 		price: product.price,
-		imageUrl: product.image,
+		imageUrl: product.imageUrl,
 		content: product.content,
 		reviews: reviewsToMap.map((review) =>
 			mongoose.isObjectIdOrHexString(review) ? review : mapReview(review)

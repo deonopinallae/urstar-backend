@@ -1,7 +1,7 @@
 import express from 'express'
-import {getUsers, getRoles, updateUser, deleteUser} from '../controllers'
-import {authenticated, hasRole} from '../middlewars'
-import {mapUser} from '../helpers'
+import {getUsers, getRoles, updateUser, deleteUser} from '../controllers/index.js'
+import {authenticated, hasRole} from '../middlewars/index.js'
+import {mapUser} from '../helpers/index.js'
 import {ROLES} from '../constants/roles.js'
 
 export const userRouter = express.Router({ mergeParams: true })

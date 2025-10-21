@@ -1,4 +1,4 @@
-import {Review, Product} from '../models'
+import {Review, Product} from '../models/index.js'
 
 //add
 export const addReview = async(productId, review) => {
@@ -9,7 +9,7 @@ export const addReview = async(productId, review) => {
 }
 
 //delete
-export const deleteReview = async(productId, reviewId) => {
+export const removeReview = async(productId, reviewId) => {
     await Review.deleteOne({_id: reviewId})
     await Product.findByIdAndUpdate(productId, {$pull: {reviews: reviewId}})
 }

@@ -7,20 +7,24 @@ import {
 	deleteProduct,
 	addReview,
 	removeReview,
-} from '../controllers'
-import { authenticated, hasRole } from '../middlewars'
-import { mapProduct, mapReview } from '../helpers'
+} from '../controllers/index.js'
+import { authenticated, hasRole } from '../middlewars/index.js'
+import { mapProduct, mapReview } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
+import { Product } from '../models/Product.js'
 
 export const productRouter = express.Router({ mergeParams: true })
 
 productRouter.get('/', async (req, res) => {
-	const { products, lastPage } = await getProducts(
-		req.query.search,
-		req.query.limit,
-		req.query.page,
-	)
-	res.send({ data: { products: products.map(mapProduct), lastPage } })
+	try {
+		const { products } = await getProducts()
+		if (products.length === 0) {
+			throw new Error('products.length 0')
+		}
+		res.send({ data: { products: products.map(mapProduct) } })
+	} catch (e) {
+		console.log(e.message)
+	}
 })
 
 productRouter.get('/:id', async (req, res) => {
@@ -28,7 +32,7 @@ productRouter.get('/:id', async (req, res) => {
 	res.send({ data: mapProduct(product) })
 })
 
-productRouter.post('/:id/reviews', authenticated, async (req, res) => {
+productRouter.post('/:id/reviews', async (req, res) => {
 	const newReview = await addReview(req.params.id, {
 		content: req.body.content,
 		author: req.user.id,

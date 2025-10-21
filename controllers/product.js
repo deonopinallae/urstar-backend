@@ -1,5 +1,4 @@
-import { Product } from '../models'
-
+import { Product } from '../models/index.js'
 
 //add
 export const addProduct = async (product) => {
@@ -7,7 +6,6 @@ export const addProduct = async (product) => {
 	await newProduct.populate({ path: 'reviews', populate: 'author' })
 	return newProduct
 }
-
 
 //edit
 export const editProduct = async (id, product) => {
@@ -18,28 +16,27 @@ export const editProduct = async (id, product) => {
 	return newProduct
 }
 
-
 //delete
 export const deleteProduct = (id) => Product.deleteOne({ _id: id })
 
-
 //get list with search and pag
-export const getProducts = async (search = '', limit = 10, page = 1) => {
-	const [products, count] = await Promise.all([
-		Product.find({ title: { $regex: search, $options: 'i' } })
-			.limit(limit)
-			.skip((page - 1) * limit)
-			.sort({ createdAt: -1 }),
-		Product.countDocuments({ title: { $regex: search, $options: 'i' } }),
+export const getProducts = async () => {
+	const [products] = await Promise.all([
+		Product.find({})
+			.populate({
+				path: 'reviews',
+				populate: { path: 'author', select: 'login' },
+			}),
 	])
 
 	return {
 		products,
-		lastPage: Math.ceil(count / limit),
 	}
 }
 
-
 //get item
 export const getProduct = (id) =>
-	Product.findById(id).populate({ path: "reviews", populate: {path: "author", select: "login"} })
+	Product.findById(id).populate({
+		path: 'reviews',
+		populate: { path: 'author', select: 'login' },
+	})

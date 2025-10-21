@@ -1,2 +1,2 @@
-export * from './authenticated'
-export * from './hasRole'
+export * from './authenticated.js'
+export * from './hasRole.js'

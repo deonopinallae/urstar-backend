@@ -23,7 +23,7 @@ const ProductSchema = mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		image: {
+		imageUrl: {
 			type: String,
 			required: true,
 			validate: {
@@ -41,7 +41,7 @@ const ProductSchema = mongoose.Schema(
 		},
 		reviews: [{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Reviews',
+			ref: 'Review',
 		}],
 	},
 	{ timestamps: true },

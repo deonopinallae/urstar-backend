@@ -1,5 +1,5 @@
-import {ROLES} from '../constants/roles'
-import {User} from '../models'
+import {ROLES} from '../constants/roles.js'
+import {User} from '../models/index.js'
 
 //register
 export const register = async(login, password) => {
