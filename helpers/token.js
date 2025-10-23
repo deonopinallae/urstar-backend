@@ -1,11 +1,21 @@
 import jwt from 'jsonwebtoken'
 
-const sign = process.env.JWT_SECRET
+const getJwtSecret = () => {
+	const secret = process.env.JWT_SECRET
+	if (!secret) {
+		throw new Error(
+			'JWT_SECRET is not defined. Check your .env setup and module loading order.',
+		)
+	}
+	return secret
+}
 
 export const generateToken = (data) => {
-    return jwt.sign(data, sign, {expiresIn: '30d'})
+	const sign = getJwtSecret()
+	return jwt.sign(data, sign, { expiresIn: '30d' })
 }
 
 export const verify = (token) => {
-    return jwt.verify(token, sign)
+	const sign = getJwtSecret()
+	return jwt.verify(token, sign)
 }

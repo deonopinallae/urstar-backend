@@ -15,6 +15,7 @@ authRouter.post('/register', async (req, res) => {
 		res.send({ error: e.message || 'Unknow error' })
 	}
 })
+
 authRouter.post('/login', async (req, res) => {
 	try {
 		const { user, token } = await login(req.body.login, req.body.password)

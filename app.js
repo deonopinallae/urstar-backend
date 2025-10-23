@@ -13,7 +13,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api', router)
-// app.use(express.static('../frontend/build'))
+app.use(express.static('../frontend/build'))
 
 mongoose.connect(process.env.DB_CONNECTION_STRING).then(() => {
 	app.listen(port, () => {
