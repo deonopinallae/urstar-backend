@@ -3,7 +3,15 @@ import validator from 'validator'
 
 const ProductSchema = mongoose.Schema(
 	{
-		title: {
+		imageUrl: {
+			type: String,
+			required: true,
+			validate: {
+				validator: validator.isURL,
+				message: 'Image should be a valid url',
+			},
+		},
+		name: {
 			type: String,
 			required: true,
 		},
@@ -23,20 +31,8 @@ const ProductSchema = mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		imageUrl: {
-			type: String,
-			required: true,
-			validate: {
-				validator: validator.isURL,
-				message: 'Image should be a valid url',
-			},
-		},
 		description: {
 			type: String,
-			required: true,
-		},
-		rating: {
-			type: Number,
 			required: true,
 		},
 		reviews: [{

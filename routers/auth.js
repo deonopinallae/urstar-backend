@@ -9,7 +9,7 @@ authRouter.post('/register', async (req, res) => {
 		const { user, token } = await register(req.body.login, req.body.password)
 		res.cookie('token', token, { httpOnly: true }).send({
 			error: null,
-			user: mapUser(user),
+			user: mapUser(user)
 		})
 	} catch (e) {
 		res.send({ error: e.message || 'Unknow error' })

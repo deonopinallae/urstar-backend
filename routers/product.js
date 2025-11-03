@@ -11,7 +11,6 @@ import {
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapProduct, mapReview } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
-import { Product } from '../models/Product.js'
 
 export const productRouter = express.Router({ mergeParams: true })
 
@@ -19,7 +18,7 @@ productRouter.get('/', async (req, res) => {
 	try {
 		const { products } = await getProducts()
 		if (products.length === 0) {
-			throw new Error('products.length 0')
+			throw new Error('no products')
 		}
 		res.send({ data: { products: products.map(mapProduct) } })
 	} catch (e) {
@@ -44,7 +43,7 @@ productRouter.post('/:id/reviews', async (req, res) => {
 productRouter.delete(
 	'/:productId/reviews/:reviewId',
 	authenticated,
-	hasRole([ROLES.ADMIN, ROLES.MODERATOR]),
+	hasRole([ROLES.ADMIN]),
 	async (req, res) => {
 		await removeReview(req.params.productId, req.params.reviewId)
 
@@ -54,6 +53,7 @@ productRouter.delete(
 
 productRouter.post('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const newProduct = await addProduct({
+		imageUrl: req.body.imageUrl,
 		title: req.body.title,
 		brand: req.body.brand,
 		type: req.body.type,
@@ -65,11 +65,15 @@ productRouter.post('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) 
 	res.send({ data: mapProduct(newProduct) })
 })
 
-productRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
+productRouter.patch('/:id/edit', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const updatedProduct = await editProduct(req.params.id, {
-		title: req.body.title,
-		content: req.body.content,
-		image: req.body.imageUrl,
+		imageUrl: req.body.imageUrl,
+		name: req.body.name,
+		brand: req.body.brand,
+		price: req.body.price,
+		type: req.body.type,
+		category: req.body.category,
+		description: req.body.description,
 	})
 
 	res.send({ data: updatedProduct })

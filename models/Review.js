@@ -15,6 +15,10 @@ const ReviewSchema = mongoose.Schema(
 			type: Number,
 			required: true,
 		},
+		publishedAt: {
+			type: Date,
+			required: true,
+		},
 	},
 	{ timestamps: true },
 )

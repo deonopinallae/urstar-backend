@@ -5,10 +5,6 @@ import { generateToken } from '../helpers/index.js'
 
 //register
 export const register = async (login, password) => {
-    const userCheck = await User.findOne({login})
-    if(userCheck){
-        throw new Error('user already registed')
-    }
 	if (!password) {
 		throw new Error('passwors is empty')
 	}
@@ -42,11 +38,16 @@ export const getUsers = () => {
 	return User.find()
 }
 
+//get user
+export const getUser = (userId) => {
+	return User.findById(userId)
+}
+
 //get roles
 export const getRoles = () => {
 	return [
 		{ id: ROLES.ADMIN, name: 'admin' },
-		{ id: ROLES.ADMIN, name: 'user' },
+		{ id: ROLES.USER, name: 'user' },
 		{ id: ROLES.GUEST, name: 'guest' },
 	]
 }
@@ -59,4 +60,17 @@ export const deleteUser = (id) => {
 //edit (roles)
 export const updateUser = (id, userData) => {
 	return User.findByIdAndUpdate(id, userData, { returnDocument: 'after' })
+}
+
+//get user products in cart
+export const getUserCart = (userId) => {
+	const user = User.findById(userId)
+	console.log(user.inCart)
+	return user.inCart 
+}
+
+//add product in cart
+export const addProductInCart = async(product) => {
+	const newComment = await .create(product)
+
 }

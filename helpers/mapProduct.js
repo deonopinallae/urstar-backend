@@ -5,17 +5,16 @@ export const mapProduct = (product) => {
 	const reviewsToMap = product.reviews || []
 	return {
 		id: product.id,
-		title: product.title,
+		imageUrl: product.imageUrl,
+		name: product.name,
 		brand: product.brand,
 		type: product.type,
 		category: product.category,
 		price: product.price,
-		imageUrl: product.imageUrl,
 		content: product.content,
 		reviews: reviewsToMap.map((review) =>
 			mongoose.isObjectIdOrHexString(review) ? review : mapReview(review)
 		),
 		description: product.description,
-		rating: product.rating,
 	}
 }
