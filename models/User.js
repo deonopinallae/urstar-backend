@@ -16,7 +16,11 @@ const UserSchema = mongoose.Schema(
 			type: Number,
 			default: ROLES.USER,
 		},
-		inCart: [
+		registeredAt: {
+			type: String,
+			required: true,
+		},
+		cart: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Product',
@@ -28,10 +32,16 @@ const UserSchema = mongoose.Schema(
 				ref: 'Product',
 			},
 		],
-		toCombine: [
+		combinerProducts: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Product',
+			},
+		],
+		outfits: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Outfit',
 			},
 		],
 	},

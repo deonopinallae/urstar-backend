@@ -6,7 +6,7 @@ export const authRouter = express.Router({ mergeParams: true })
 
 authRouter.post('/register', async (req, res) => {
 	try {
-		const { user, token } = await register(req.body.login, req.body.password)
+		const { user, token } = await register(req.body.login, req.body.password, req.body.registeredAt)
 		res.cookie('token', token, { httpOnly: true }).send({
 			error: null,
 			user: mapUser(user)

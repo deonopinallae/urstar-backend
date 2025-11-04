@@ -1,8 +1,15 @@
 import express from 'express'
-import { getUsers, getRoles, updateUser, deleteUser, getUser, getUserCart } from '../controllers/index.js'
+import {
+	getUsers,
+	getRoles,
+	updateUser,
+	deleteUser,
+	addProductToCombiner,
+} from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapUser } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
+import { User } from '../models/User.js'
 
 export const userRouter = express.Router({ mergeParams: true })
 
@@ -18,18 +25,18 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: roles })
 })
 
-userRouter.get('/:id', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
-  const newComment = await addComment(req.params.id, {
-    content: req.body.content,
-    author: req.user.id
-  }) 
+// userRouter.get('/:id', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
+//   const newComment = await addComment(req.params.id, {
+//     content: req.body.content,
+//     author: req.user.id
+//   })
 
-  res.send({data: mapComment(newComment)})
-})
+//   res.send({data: mapComment(newComment)})
+// })
 
-userRouter.post('/:id/cart', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
-
-  res.send({  })
+userRouter.post('/:id/cart', authenticated, async (req, res) => {
+	const updatedCart = await addProductInCart(req.params.id, req.body.productData)
+	res.send({ data: mapUser(updatedCart) })
 })
 
 userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
@@ -44,4 +51,14 @@ userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res
 	await deleteUser(req.params.id)
 
 	res.send({ error: null })
+})
+
+userRouter.post('/:id/combiner', authenticated, async (req, res) => {
+	const updatedUser = await addProductToCombiner(req.params.id, req.body.productData)
+	res.send({ data: mapUser(updatedUser) })
+})
+
+userRouter.get('/:id', authenticated, async (req, res) => {
+  const user = await User.findById(req.params.id)
+  res.send({ data: mapUser(user) })
 })

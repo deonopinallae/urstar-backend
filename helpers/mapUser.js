@@ -1,10 +1,10 @@
-export const mapUser = (user) => {
-    return{
-        id: user.id,
-        login: user.login,
-        roleId: user.role,
-        inCart: user.inCart,
-        favorites: user.favorites,
-        toCombine: user.toCombine
-    }
-}
+export const mapUser = (user) => ({
+	id: user.id,
+	login: user.login,
+	roleId: user.role,
+	registeredAt: user.registeredAt,
+	cart: user.cart,
+	favorites: user.favorites,
+	combinerProducts: user.combinerProducts,
+	outfits: user.outfits,
+})

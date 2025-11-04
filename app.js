@@ -11,9 +11,7 @@ const port = 3001
 const app = express()
 
 const corsOptions = {
-  // Замените на домен/порт вашего фронтенда!
   origin: 'http://localhost:5137', 
-  // ЭТО КРИТИЧЕСКИ ВАЖНО для передачи cookies (credentials)
   credentials: true,
 }
 app.use(cors(corsOptions))

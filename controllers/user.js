@@ -1,15 +1,15 @@
 import bcrypt from 'bcrypt'
 import { ROLES } from '../constants/roles.js'
 import { User } from '../models/index.js'
-import { generateToken } from '../helpers/index.js'
+import { generateToken, mapUser } from '../helpers/index.js'
 
 //register
-export const register = async (login, password) => {
+export const register = async (login, password, registeredAt) => {
 	if (!password) {
 		throw new Error('passwors is empty')
 	}
 	const passwordHash = await bcrypt.hash(password, 10)
-	const user = await User.create({ login, password: passwordHash })
+	const user = await User.create({ login, password: passwordHash, registeredAt})
 	const token = generateToken({ id: user.id })
 
 	return { user, token }
@@ -30,7 +30,7 @@ export const login = async (login, password) => {
 	}
 
 	const token = generateToken({ id: user.id })
-	return { token, user }
+	return { token, user: mapUser(user) }
 }
 
 //get users
@@ -69,8 +69,19 @@ export const getUserCart = (userId) => {
 	return user.inCart 
 }
 
-//add product in cart
-export const addProductInCart = async(product) => {
-	const newComment = await .create(product)
+//add product to cart
+export const addProductInCart = async(userId, productData) => {
+	await User.findByIdAndUpdate(userId, {$push: {inCart: productData}})
+	return productData
+}
 
+//add product to combiner
+export const addProductToCombiner = async(userId, productData) => {
+	const updatedUser = await User.findByIdAndUpdate(
+	userId,
+	{ $push: { combinerProducts: productData } },
+	{ new: true }
+)
+
+	return updatedUser
 }
