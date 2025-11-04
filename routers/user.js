@@ -39,6 +39,8 @@ userRouter.post('/:id/cart', authenticated, async (req, res) => {
 	res.send({ data: mapUser(updatedCart) })
 })
 
+
+//change user role
 userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const newUser = await updateUser(req.params.id, {
 		role: req.body.roleId,
@@ -47,17 +49,23 @@ userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: mapUser(newUser) })
 })
 
+
+//delete user
 userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	await deleteUser(req.params.id)
 
 	res.send({ error: null })
 })
 
+
+//add product to combiner
 userRouter.post('/:id/combiner', authenticated, async (req, res) => {
 	const updatedUser = await addProductToCombiner(req.params.id, req.body.productData)
 	res.send({ data: mapUser(updatedUser) })
 })
 
+
+//get user
 userRouter.get('/:id', authenticated, async (req, res) => {
   const user = await User.findById(req.params.id)
   res.send({ data: mapUser(user) })
