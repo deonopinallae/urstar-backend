@@ -35,8 +35,10 @@ export const getProducts = async () => {
 }
 
 //get item
-export const getProduct = (id) =>
-	Product.findById(id).populate({
+export const getProduct = (id) =>{
+	const product = Product.findById(id).populate({
 		path: 'reviews',
 		populate: { path: 'author', select: 'login' },
 	})
+	return product
+}

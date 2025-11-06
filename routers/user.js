@@ -13,18 +13,22 @@ import { User } from '../models/User.js'
 
 export const userRouter = express.Router({ mergeParams: true })
 
+//get users
 userRouter.get('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const users = await getUsers()
 
 	res.send({ data: users.map(mapUser) })
 })
 
+//get roles
 userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const roles = getRoles()
 
 	res.send({ data: roles })
 })
 
+
+//get reviews
 // userRouter.get('/:id', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
 //   const newComment = await addComment(req.params.id, {
 //     content: req.body.content,
@@ -34,6 +38,8 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 //   res.send({data: mapComment(newComment)})
 // })
 
+
+//add product to cart
 userRouter.post('/:id/cart', authenticated, async (req, res) => {
 	const updatedCart = await addProductInCart(req.params.id, req.body.productData)
 	res.send({ data: mapUser(updatedCart) })
@@ -59,9 +65,17 @@ userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res
 
 
 //add product to combiner
-userRouter.post('/:id/combiner', authenticated, async (req, res) => {
-	const updatedUser = await addProductToCombiner(req.params.id, req.body.productData)
-	res.send({ data: mapUser(updatedUser) })
+userRouter.post('/:id/combiner', async (req, res) => {
+	try {
+		const {productId} = req.body
+		const userId = req.params.id
+		const product = await addProductToCombiner(userId, productId)
+
+		res.status(200).json(product)
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
 })
 
 

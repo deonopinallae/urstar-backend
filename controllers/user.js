@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import { ROLES } from '../constants/roles.js'
-import { User } from '../models/index.js'
-import { generateToken, mapUser } from '../helpers/index.js'
+import { Product, User } from '../models/index.js'
+import { generateToken, mapProduct, mapUser } from '../helpers/index.js'
 
 //register
 export const register = async (login, password, registeredAt) => {
@@ -65,7 +65,6 @@ export const updateUser = (id, userData) => {
 //get user products in cart
 export const getUserCart = (userId) => {
 	const user = User.findById(userId)
-	console.log(user.inCart)
 	return user.inCart 
 }
 
@@ -76,12 +75,14 @@ export const addProductInCart = async(userId, productData) => {
 }
 
 //add product to combiner
-export const addProductToCombiner = async(userId, productData) => {
-	const updatedUser = await User.findByIdAndUpdate(
-	userId,
-	{ $push: { combinerProducts: productData } },
-	{ new: true }
-)
+export const addProductToCombiner = async (userId, productId) => {
+	const product = await Product.findById(productId)
+	if (!product) throw new Error('product not found')
 
-	return updatedUser
+	await User.findByIdAndUpdate(
+		userId,
+		{ $push: { combinerProducts: productId } },
+		{ new: true },
+	).populate('combinerProducts')
+	return product
 }

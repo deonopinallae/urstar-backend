@@ -20,7 +20,7 @@ productRouter.get('/', async (req, res) => {
 		if (products.length === 0) {
 			throw new Error('no products')
 		}
-		res.send({ data: { products: products.map(mapProduct) } })
+		res.send({ data: { products: products.map(product => mapProduct(product)) } })
 	} catch (e) {
 		console.log(e.message)
 	}

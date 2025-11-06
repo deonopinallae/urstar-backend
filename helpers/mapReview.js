@@ -1,8 +1,8 @@
 export const mapReview = (review) => {
     return {
-        id: review._id,
+        id: review.id,
         content: review.content,
-        author: review.author.login || review.author,
+        author: review.author,
         publishedAt: review.publishedAt,
         rating: review.rating
     }

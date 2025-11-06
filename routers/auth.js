@@ -19,7 +19,6 @@ authRouter.post('/register', async (req, res) => {
 authRouter.post('/login', async (req, res) => {
 	try {
 		const { user, token } = await login(req.body.login, req.body.password)
-
 		res.cookie('token', token, { httpOnly: true }).send({
 			error: null,
 			user: mapUser(user),
