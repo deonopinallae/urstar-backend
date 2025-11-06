@@ -27,7 +27,6 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: roles })
 })
 
-
 //get reviews
 // userRouter.get('/:id', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
 //   const newComment = await addComment(req.params.id, {
@@ -38,13 +37,11 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 //   res.send({data: mapComment(newComment)})
 // })
 
-
 //add product to cart
 userRouter.post('/:id/cart', authenticated, async (req, res) => {
 	const updatedCart = await addProductInCart(req.params.id, req.body.productData)
 	res.send({ data: mapUser(updatedCart) })
 })
-
 
 //change user role
 userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
@@ -55,7 +52,6 @@ userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: mapUser(newUser) })
 })
 
-
 //delete user
 userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	await deleteUser(req.params.id)
@@ -63,11 +59,10 @@ userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res
 	res.send({ error: null })
 })
 
-
 //add product to combiner
 userRouter.post('/:id/combiner', async (req, res) => {
 	try {
-		const {productId} = req.body
+		const { productId } = req.body
 		const userId = req.params.id
 		const product = await addProductToCombiner(userId, productId)
 
@@ -78,9 +73,22 @@ userRouter.post('/:id/combiner', async (req, res) => {
 	}
 })
 
+//get product combiner
+userRouter.get('/:id/combiner', authenticated, async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id).populate('combinerProducts')
+		res.send({ data: user.combinerProducts })
+	} catch (error) {
+		console.log(error)
+	}
+})
 
 //get user
 userRouter.get('/:id', authenticated, async (req, res) => {
-  const user = await User.findById(req.params.id)
-  res.send({ data: mapUser(user) })
+	try {
+		const user = await User.findById(req.params.id).populate('combinerProducts')
+		res.send({ data: mapUser(user) })
+	} catch (error) {
+		console.log(error)
+	}
 })
