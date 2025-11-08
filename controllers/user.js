@@ -74,15 +74,27 @@ export const addProductInCart = async(userId, productData) => {
 	return productData
 }
 
-//add product to combiner
+//add product combiner
 export const addProductToCombiner = async (userId, productId) => {
 	const product = await Product.findById(productId)
 	if (!product) throw new Error('product not found')
 
 	await User.findByIdAndUpdate(
 		userId,
-		{ $push: { combinerProducts: productId } },
+		{ $addToSet: { combinerProducts: productId } },
 		{ new: true },
 	).populate('combinerProducts')
 	return product
+}
+
+//remove product combiner
+export const removeProductFromCombiner = async (userId, productId) => {
+	const updatedUser = await User.findByIdAndUpdate(
+		userId,
+		{ $pull: { combinerProducts: productId } },
+		{ new: true },
+	).populate('combinerProducts')
+
+	if (!updatedUser) throw new Error('User not found')
+	return updatedUser
 }

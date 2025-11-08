@@ -5,6 +5,7 @@ import {
 	updateUser,
 	deleteUser,
 	addProductToCombiner,
+	removeProductFromCombiner,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapUser } from '../helpers/index.js'
@@ -81,6 +82,18 @@ userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 	} catch (error) {
 		console.log(error)
 	}
+})
+
+//delete product combiner
+userRouter.delete('/:id/combiner/:productId', authenticated, async (req, res) => {
+		try {
+		const { id, productId } = req.params
+		const updatedUser = await removeProductFromCombiner(id, productId)
+		res.status(200).json(updatedUser)
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	} 
 })
 
 //get user
