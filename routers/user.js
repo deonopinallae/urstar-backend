@@ -6,6 +6,8 @@ import {
 	deleteUser,
 	addProductToCombiner,
 	removeProductFromCombiner,
+	saveOutfit,
+	deleteOutfit,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapUser } from '../helpers/index.js'
@@ -28,22 +30,6 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: roles })
 })
 
-//get reviews
-// userRouter.get('/:id', authenticated, hasRole([ROLES.ADMIN, ROLES.USER]), async (req, res) => {
-//   const newComment = await addComment(req.params.id, {
-//     content: req.body.content,
-//     author: req.user.id
-//   })
-
-//   res.send({data: mapComment(newComment)})
-// })
-
-//add product to cart
-userRouter.post('/:id/cart', authenticated, async (req, res) => {
-	const updatedCart = await addProductInCart(req.params.id, req.body.productData)
-	res.send({ data: mapUser(updatedCart) })
-})
-
 //change user role
 userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const newUser = await updateUser(req.params.id, {
@@ -56,7 +42,6 @@ userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 //delete user
 userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	await deleteUser(req.params.id)
-
 	res.send({ error: null })
 })
 
@@ -74,7 +59,7 @@ userRouter.post('/:id/combiner', async (req, res) => {
 	}
 })
 
-//get product combiner
+//get products combiner
 userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).populate('combinerProducts')
@@ -86,20 +71,65 @@ userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 
 //delete product combiner
 userRouter.delete('/:id/combiner/:productId', authenticated, async (req, res) => {
-		try {
-		const { id, productId } = req.params
-		const updatedUser = await removeProductFromCombiner(id, productId)
-		res.status(200).json(updatedUser)
+	try {
+		const userId = req.params.id
+		const productId = req.params.productId
+		const updatedUser = await removeProductFromCombiner(userId, productId)
+
+		res.send({ data: updatedUser.combinerProducts })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
-	} 
+	}
+})
+
+//save outfit
+userRouter.post('/:id/outfits', authenticated, async (req, res) => {
+	try {
+		const { outfitData } = req.body
+		const userId = req.params.id
+		const outfit = await saveOutfit(userId, outfitData)
+
+		res.send({ outfit })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//delete product combiner
+userRouter.delete('/:id/outfits/:outfitId', authenticated, async (req, res) => {
+	try {
+		const userId = req.params.id
+		const outfitId = req.params.outfitId
+		const updatedUser = await deleteOutfit(userId, outfitId)
+
+		res.send({ data: updatedUser.outfits })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//set outfits
+userRouter.get('/:id/outfits', authenticated, async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id).populate('outfits')
+		res.send({ data: user.outfits })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
 })
 
 //get user
 userRouter.get('/:id', authenticated, async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id).populate('combinerProducts')
+		const user = await User.findById(req.params.id)
+			.populate('combinerProducts')
+			.populate('outfits')
+			.populate('cart')
+			.populate('favorites')
 		res.send({ data: mapUser(user) })
 	} catch (error) {
 		console.log(error)

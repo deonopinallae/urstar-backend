@@ -9,7 +9,7 @@ export const register = async (login, password, registeredAt) => {
 		throw new Error('passwors is empty')
 	}
 	const passwordHash = await bcrypt.hash(password, 10)
-	const user = await User.create({ login, password: passwordHash, registeredAt})
+	const user = await User.create({ login, password: passwordHash, registeredAt })
 	const token = generateToken({ id: user.id })
 
 	return { user, token }
@@ -18,6 +18,15 @@ export const register = async (login, password, registeredAt) => {
 //login
 export const login = async (login, password) => {
 	const user = await User.findOne({ login })
+		.populate('combinerProducts')
+		.populate('outfits')
+		.populate('cart')
+		.populate('favorites')
+
+
+		console.log(user)       // что реально приходит
+console.log(user._id)   // undefined?
+console.log(user.id)    // есть ли виртуальное поле?
 
 	if (!user) {
 		throw new Error('user not found')
@@ -65,12 +74,12 @@ export const updateUser = (id, userData) => {
 //get user products in cart
 export const getUserCart = (userId) => {
 	const user = User.findById(userId)
-	return user.inCart 
+	return user.inCart
 }
 
 //add product to cart
-export const addProductInCart = async(userId, productData) => {
-	await User.findByIdAndUpdate(userId, {$push: {inCart: productData}})
+export const addProductInCart = async (userId, productData) => {
+	await User.findByIdAndUpdate(userId, { $push: { inCart: productData } })
 	return productData
 }
 
@@ -84,7 +93,7 @@ export const addProductToCombiner = async (userId, productId) => {
 		{ $addToSet: { combinerProducts: productId } },
 		{ new: true },
 	).populate('combinerProducts')
-	return product
+	return mapProduct(product) 
 }
 
 //remove product combiner
@@ -96,5 +105,31 @@ export const removeProductFromCombiner = async (userId, productId) => {
 	).populate('combinerProducts')
 
 	if (!updatedUser) throw new Error('User not found')
-	return updatedUser
+	return mapUser(updatedUser) 
+}
+
+//save outfit
+export const saveOutfit = async (userId, outfitData) => {
+	const updatedUser = await User.findByIdAndUpdate(
+		userId,
+		{ $push: { outfits: { $each: [outfitData], $position: 0 } } },
+		{ new: true }
+	).populate('outfits')
+
+	if (!updatedUser) throw new Error('User not found')
+
+	const newOutfit = updatedUser.outfits[0] 
+	return newOutfit
+}
+
+//delete outfit
+export const deleteOutfit = async (userId, outfitId) => {
+	const updatedUser = await User.findByIdAndUpdate(
+		userId,
+		{ $pull: { outfits: { _id: outfitId } } },
+		{ new: true },
+	).populate('outfits')
+
+	if (!updatedUser) throw new Error('User not found')
+	return mapUser(updatedUser) 
 }
