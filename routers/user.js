@@ -97,14 +97,31 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 	}
 })
 
-//delete product combiner
+//get outfit
+userRouter.get('/:id/outfits/:outfitId', authenticated, async (req, res) => {
+	try {
+		const userId = req.params.id
+		const outfitId = req.params.outfitId
+		const user = await User.findById(userId).populate('outfits')
+
+		const outfit = user.outfits.id(outfitId)
+		if (!outfit) throw new Error('outfit not found')
+
+		res.send({ data: outfit })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//delete outfit
 userRouter.delete('/:id/outfits/:outfitId', authenticated, async (req, res) => {
 	try {
 		const userId = req.params.id
 		const outfitId = req.params.outfitId
-		const updatedUser = await deleteOutfit(userId, outfitId)
+		await deleteOutfit(userId, outfitId)
 
-		res.send({ data: updatedUser.outfits })
+		res.send({ data: outfitId })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })

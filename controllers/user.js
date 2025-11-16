@@ -23,11 +23,6 @@ export const login = async (login, password) => {
 		.populate('cart')
 		.populate('favorites')
 
-
-		console.log(user)       // что реально приходит
-console.log(user._id)   // undefined?
-console.log(user.id)    // есть ли виртуальное поле?
-
 	if (!user) {
 		throw new Error('user not found')
 	}
