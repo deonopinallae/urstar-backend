@@ -129,7 +129,6 @@ export const addProductToFavorites = async (userId, productId) => {
 	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
 		throw new Error('invalid userId or productId')
 	}
-
 	const product = await Product.findById(productId)
 	if (!product) throw new Error('Product not found')
 
@@ -141,7 +140,7 @@ export const addProductToFavorites = async (userId, productId) => {
 
 	if (!updatedUser) throw new Error('User not found')
 
-	return mapUser(updatedUser)
+	return mapProduct(product)
 }
 
 //remove product from favorites

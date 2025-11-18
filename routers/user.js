@@ -40,7 +40,7 @@ userRouter.post('/:id/combiner', async (req, res) => {
 
 		const product = await addProductToCombiner(userId, productId)
 
-		res.send({product})
+		res.send({ product })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -62,10 +62,10 @@ userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 userRouter.delete('/:id/combiner/:productId', authenticated, async (req, res) => {
 	try {
 		const userId = req.params.id
-		const productId = req.params.productId		
+		const productId = req.params.productId
 		await removeProductFromCombiner(userId, productId)
 
-		res.send({productId})
+		res.send({ productId })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -79,7 +79,7 @@ userRouter.post('/:id/favorites', async (req, res) => {
 		const userId = req.params.id
 		const product = await addProductToFavorites(userId, productId)
 
-		res.status(200).json(product)
+		res.send({product})
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -92,9 +92,9 @@ userRouter.delete('/:id/favorites/:productId', authenticated, async (req, res) =
 		const userId = req.params.id
 		const productId = req.params.productId
 		console.log(req.params, req.body)
-		const updatedUser = await removeProductFromFavorites(userId, productId)
+		await removeProductFromFavorites(userId, productId)
 
-		res.send({ data: updatedUser.favorites })
+		res.send({ productId })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
