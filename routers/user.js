@@ -12,7 +12,7 @@ import {
 	removeProductFromFavorites,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
-import { mapUser } from '../helpers/index.js'
+import { mapProduct, mapUser } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
 import { User } from '../models/User.js'
 
@@ -40,7 +40,7 @@ userRouter.post('/:id/combiner', async (req, res) => {
 
 		const product = await addProductToCombiner(userId, productId)
 
-		res.status(200).json(product)
+		res.send({product})
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -51,7 +51,8 @@ userRouter.post('/:id/combiner', async (req, res) => {
 userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).populate('combinerProducts')
-		res.send({ data: user.combinerProducts })
+		const combinerProducts = user.combinerProducts.map((p) => mapProduct(p))
+		res.send({ data: combinerProducts })
 	} catch (error) {
 		console.log(error)
 	}
@@ -61,12 +62,10 @@ userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 userRouter.delete('/:id/combiner/:productId', authenticated, async (req, res) => {
 	try {
 		const userId = req.params.id
-		const productId = req.params.productId
-			console.log('userId:', req.params.id, 'productId:', req.params.productId)
-		
-		const updatedUser = await removeProductFromCombiner(userId, productId)
+		const productId = req.params.productId		
+		await removeProductFromCombiner(userId, productId)
 
-		res.send({ data: updatedUser.combinerProducts })
+		res.send({productId})
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })

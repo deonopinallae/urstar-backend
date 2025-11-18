@@ -99,10 +99,6 @@ export const addProductToCombiner = async (userId, productId) => {
 //remove product from combiner
 export const removeProductFromCombiner = async (userId, productId) => {
 
-	const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
-	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
-		throw new Error('invalid userId or productId')
-	}
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
 		{ $pull: { combinerProducts: productId } },

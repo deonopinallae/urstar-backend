@@ -1,6 +1,3 @@
-import mongoose from 'mongoose'
-import { mapReview } from './mapReview.js'
-
 export const mapProduct = (product) => {
 	return {
 		id: product._id.toString(),
