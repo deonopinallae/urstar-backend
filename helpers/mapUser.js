@@ -5,7 +5,7 @@ export const mapUser = (user) => ({
 	login: user.login,
 	roleId: user.role,
 	cart: [...(user.cart || [])],
-	favorites: [...(user.favorites || [])],
+	favorites: (user.favorites || []).map(mapProduct),
 	combinerProducts: (user.combinerProducts || []).map(mapProduct),
 	outfits: [...(user.outfits || [])],
 })

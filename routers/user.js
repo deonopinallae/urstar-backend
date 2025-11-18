@@ -91,7 +91,6 @@ userRouter.delete('/:id/favorites/:productId', authenticated, async (req, res) =
 	try {
 		const userId = req.params.id
 		const productId = req.params.productId
-		console.log(req.params, req.body)
 		await removeProductFromFavorites(userId, productId)
 
 		res.send({ productId })
