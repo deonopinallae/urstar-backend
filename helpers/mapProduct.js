@@ -3,7 +3,7 @@ import { mapReview } from './mapReview.js'
 
 export const mapProduct = (product) => {
 	return {
-		id: product._id,
+		id: product._id.toString(),
 		imageUrl: product.imageUrl,
 		name: product.name,
 		brand: product.brand,

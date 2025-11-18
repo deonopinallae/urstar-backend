@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import { ROLES } from '../constants/roles.js'
 import { Product, User } from '../models/index.js'
 import { generateToken, mapProduct, mapUser } from '../helpers/index.js'
+import mongoose from 'mongoose'
 
 //register
 export const register = async (login, password, registeredAt) => {
@@ -78,8 +79,12 @@ export const addProductInCart = async (userId, productData) => {
 	return productData
 }
 
-//add product combiner
+//add product to combiner
 export const addProductToCombiner = async (userId, productId) => {
+	const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
+	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+		throw new Error('invalid userId or productId')
+	}
 	const product = await Product.findById(productId)
 	if (!product) throw new Error('product not found')
 
@@ -88,11 +93,16 @@ export const addProductToCombiner = async (userId, productId) => {
 		{ $addToSet: { combinerProducts: productId } },
 		{ new: true },
 	).populate('combinerProducts')
-	return mapProduct(product) 
+	return mapProduct(product)
 }
 
-//remove product combiner
+//remove product from combiner
 export const removeProductFromCombiner = async (userId, productId) => {
+
+	const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
+	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+		throw new Error('invalid userId or productId')
+	}
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
 		{ $pull: { combinerProducts: productId } },
@@ -100,7 +110,7 @@ export const removeProductFromCombiner = async (userId, productId) => {
 	).populate('combinerProducts')
 
 	if (!updatedUser) throw new Error('User not found')
-	return mapUser(updatedUser) 
+	return mapUser(updatedUser)
 }
 
 //save outfit
@@ -108,13 +118,50 @@ export const saveOutfit = async (userId, outfitData) => {
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
 		{ $push: { outfits: { $each: [outfitData], $position: 0 } } },
-		{ new: true }
+		{ new: true },
 	).populate('outfits')
 
 	if (!updatedUser) throw new Error('User not found')
 
-	const newOutfit = updatedUser.outfits[0] 
+	const newOutfit = updatedUser.outfits[0]
 	return newOutfit
+}
+
+//add product to favorites
+export const addProductToFavorites = async (userId, productId) => {
+	const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
+	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+		throw new Error('invalid userId or productId')
+	}
+
+	const product = await Product.findById(productId)
+	if (!product) throw new Error('Product not found')
+
+	const updatedUser = await User.findByIdAndUpdate(
+		userId,
+		{ $addToSet: { favorites: productId } },
+		{ new: true },
+	).populate('favorites')
+
+	if (!updatedUser) throw new Error('User not found')
+
+	return mapUser(updatedUser)
+}
+
+//remove product from favorites
+export const removeProductFromFavorites = async (userId, productId) => {
+	const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
+	if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+		throw new Error('invalid userId or productId')
+	}
+	const updatedUser = await User.findByIdAndUpdate(
+		userId,
+		{ $pull: { favorites: productId } },
+		{ new: true },
+	).populate('favorites')
+
+	if (!updatedUser) throw new Error('User not found')
+	return mapUser(updatedUser)
 }
 
 //delete outfit
@@ -126,5 +173,5 @@ export const deleteOutfit = async (userId, outfitId) => {
 	).populate('outfits')
 
 	if (!updatedUser) throw new Error('User not found')
-	return mapUser(updatedUser) 
+	return mapUser(updatedUser)
 }

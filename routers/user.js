@@ -8,6 +8,8 @@ import {
 	removeProductFromCombiner,
 	saveOutfit,
 	deleteOutfit,
+	addProductToFavorites,
+	removeProductFromFavorites,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapUser } from '../helpers/index.js'
@@ -30,26 +32,12 @@ userRouter.get('/roles', authenticated, hasRole([ROLES.ADMIN]), async (req, res)
 	res.send({ data: roles })
 })
 
-//change user role
-userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
-	const newUser = await updateUser(req.params.id, {
-		role: req.body.roleId,
-	})
-
-	res.send({ data: mapUser(newUser) })
-})
-
-//delete user
-userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
-	await deleteUser(req.params.id)
-	res.send({ error: null })
-})
-
 //add product to combiner
 userRouter.post('/:id/combiner', async (req, res) => {
 	try {
 		const { productId } = req.body
 		const userId = req.params.id
+
 		const product = await addProductToCombiner(userId, productId)
 
 		res.status(200).json(product)
@@ -59,7 +47,7 @@ userRouter.post('/:id/combiner', async (req, res) => {
 	}
 })
 
-//get products combiner
+//get products from combiner
 userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).populate('combinerProducts')
@@ -69,14 +57,45 @@ userRouter.get('/:id/combiner', authenticated, async (req, res) => {
 	}
 })
 
-//delete product combiner
+//remove product from combiner
 userRouter.delete('/:id/combiner/:productId', authenticated, async (req, res) => {
 	try {
 		const userId = req.params.id
 		const productId = req.params.productId
+			console.log('userId:', req.params.id, 'productId:', req.params.productId)
+		
 		const updatedUser = await removeProductFromCombiner(userId, productId)
 
 		res.send({ data: updatedUser.combinerProducts })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//add product to favorites
+userRouter.post('/:id/favorites', async (req, res) => {
+	try {
+		const { productId } = req.body
+		const userId = req.params.id
+		const product = await addProductToFavorites(userId, productId)
+
+		res.status(200).json(product)
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//remove product from favorites
+userRouter.delete('/:id/favorites/:productId', authenticated, async (req, res) => {
+	try {
+		const userId = req.params.id
+		const productId = req.params.productId
+		console.log(req.params, req.body)
+		const updatedUser = await removeProductFromFavorites(userId, productId)
+
+		res.send({ data: updatedUser.favorites })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -91,6 +110,17 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 		const outfit = await saveOutfit(userId, outfitData)
 
 		res.send({ outfit })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//set outfits
+userRouter.get('/:id/outfits', authenticated, async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id).populate('outfits')
+		res.send({ data: user.outfits })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -128,17 +158,6 @@ userRouter.delete('/:id/outfits/:outfitId', authenticated, async (req, res) => {
 	}
 })
 
-//set outfits
-userRouter.get('/:id/outfits', authenticated, async (req, res) => {
-	try {
-		const user = await User.findById(req.params.id).populate('outfits')
-		res.send({ data: user.outfits })
-	} catch (error) {
-		console.error(error)
-		res.status(500).json({ message: error.message })
-	}
-})
-
 //get user
 userRouter.get('/:id', authenticated, async (req, res) => {
 	try {
@@ -151,4 +170,19 @@ userRouter.get('/:id', authenticated, async (req, res) => {
 	} catch (error) {
 		console.log(error)
 	}
+})
+
+//change user role
+userRouter.patch('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
+	const newUser = await updateUser(req.params.id, {
+		role: req.body.roleId,
+	})
+
+	res.send({ data: mapUser(newUser) })
+})
+
+//delete user
+userRouter.delete('/:id', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
+	await deleteUser(req.params.id)
+	res.send({ error: null })
 })
