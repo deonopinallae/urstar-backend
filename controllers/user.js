@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt'
 import { ROLES } from '../constants/roles.js'
 import { Product, User } from '../models/index.js'
-import { generateToken, mapProduct, mapUser } from '../helpers/index.js'
+import { generateToken, mapOutfit, mapProduct, mapUser } from '../helpers/index.js'
 import mongoose from 'mongoose'
+import { Outfit } from '../models/Outfit.js'
 
 //register
 export const register = async (login, password, registeredAt) => {
@@ -98,7 +99,6 @@ export const addProductToCombiner = async (userId, productId) => {
 
 //remove product from combiner
 export const removeProductFromCombiner = async (userId, productId) => {
-
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
 		{ $pull: { combinerProducts: productId } },
@@ -111,16 +111,22 @@ export const removeProductFromCombiner = async (userId, productId) => {
 
 //save outfit
 export const saveOutfit = async (userId, outfitData) => {
+	const newOutfit = await Outfit.create({
+		name: outfitData.name,
+		scene: outfitData.scene,
+		products: outfitData.products,
+		owner: userId,
+	})
+
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
-		{ $push: { outfits: { $each: [outfitData], $position: 0 } } },
+		{ $addToSet: { outfits: newOutfit.id } },
 		{ new: true },
 	).populate('outfits')
 
 	if (!updatedUser) throw new Error('User not found')
 
-	const newOutfit = updatedUser.outfits[0]
-	return newOutfit
+	return mapOutfit(newOutfit)
 }
 
 //add product to favorites
@@ -163,10 +169,12 @@ export const removeProductFromFavorites = async (userId, productId) => {
 export const deleteOutfit = async (userId, outfitId) => {
 	const updatedUser = await User.findByIdAndUpdate(
 		userId,
-		{ $pull: { outfits: { _id: outfitId } } },
+		{ $pull: { outfits: outfitId } },
 		{ new: true },
 	).populate('outfits')
 
 	if (!updatedUser) throw new Error('User not found')
-	return mapUser(updatedUser)
+
+	await Outfit.findByIdAndDelete(outfitId)
+
 }

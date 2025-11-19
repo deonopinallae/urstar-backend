@@ -21,7 +21,7 @@ authRouter.post('/login', async (req, res) => {
 		const { user, token } = await login(req.body.login, req.body.password)
 		res.cookie('token', token, { httpOnly: true }).send({
 			error: null,
-			user: mapUser(user),
+			user
 		})
 	} catch (e) {
 		res.send({ error: e.message || 'Unknow error' })

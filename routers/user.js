@@ -12,7 +12,7 @@ import {
 	removeProductFromFavorites,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
-import { mapProduct, mapUser } from '../helpers/index.js'
+import { mapOutfit, mapProduct, mapUser } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
 import { User } from '../models/User.js'
 
@@ -37,7 +37,6 @@ userRouter.post('/:id/combiner', async (req, res) => {
 	try {
 		const { productId } = req.body
 		const userId = req.params.id
-
 		const product = await addProductToCombiner(userId, productId)
 
 		res.send({ product })
@@ -79,7 +78,7 @@ userRouter.post('/:id/favorites', async (req, res) => {
 		const userId = req.params.id
 		const product = await addProductToFavorites(userId, productId)
 
-		res.send({product})
+		res.send({ product })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -106,7 +105,7 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 		const { outfitData } = req.body
 		const userId = req.params.id
 		const outfit = await saveOutfit(userId, outfitData)
-
+		
 		res.send({ outfit })
 	} catch (error) {
 		console.error(error)
@@ -118,6 +117,7 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 userRouter.get('/:id/outfits', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).populate('outfits')
+
 		res.send({ data: user.outfits })
 	} catch (error) {
 		console.error(error)
@@ -125,17 +125,18 @@ userRouter.get('/:id/outfits', authenticated, async (req, res) => {
 	}
 })
 
-//get outfit
+// get outfit
 userRouter.get('/:id/outfits/:outfitId', authenticated, async (req, res) => {
 	try {
 		const userId = req.params.id
 		const outfitId = req.params.outfitId
+
 		const user = await User.findById(userId).populate('outfits')
+		if (!user) throw new Error('User not found')
 
-		const outfit = user.outfits.id(outfitId)
-		if (!outfit) throw new Error('outfit not found')
-
-		res.send({ data: outfit })
+		const outfit = user.outfits.find((o) => o.id.toString() === outfitId)
+		if (!outfit) throw new Error('Outfit not found')
+		res.send({ data: mapOutfit(outfit) })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
@@ -149,7 +150,7 @@ userRouter.delete('/:id/outfits/:outfitId', authenticated, async (req, res) => {
 		const outfitId = req.params.outfitId
 		await deleteOutfit(userId, outfitId)
 
-		res.send({ data: outfitId })
+		res.send({ outfitId })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })

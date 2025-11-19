@@ -9,32 +9,7 @@ const UserSchema = mongoose.Schema(
 		cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
 		favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
 		combinerProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-		outfits: [
-			{
-				author: {
-					type: String,
-					required: true,
-				},
-				scene: {
-					top: {
-						type: String,
-					},
-					accessory: {
-						type: String,
-					},
-					bottom: {
-						type: String,
-					},
-					shoes: {
-						type: String,
-					},
-				},
-				name: {
-					type: String,
-					required: true,
-				},
-			},
-		],
+		outfits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Outfit' }]
 	},
 	{ timestamps: true },
 )
