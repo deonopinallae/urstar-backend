@@ -3,20 +3,19 @@ import mongoose from 'mongoose'
 const ReviewSchema = mongoose.Schema(
 	{
 		author: {
-			type: mongoose.Schema.Types.ObjectId,
+			type: String,
 			required: true,
-			ref: 'User',
 		},
 		content: {
 			type: String,
 			required: true,
 		},
 		rating: {
-			type: Number,
+			type: String,
 			required: true,
 		},
 		publishedAt: {
-			type: Date,
+			type: String,
 			required: true,
 		},
 	},

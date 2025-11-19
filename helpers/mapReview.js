@@ -1,6 +1,6 @@
 export const mapReview = (review) => {
     return {
-        id: review.id,
+        id: review._id.toString(),
         content: review.content,
         author: review.author,
         publishedAt: review.publishedAt,

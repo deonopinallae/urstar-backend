@@ -1,3 +1,5 @@
+import { mapReview } from "./mapReview.js"
+
 export const mapProduct = (product) => {
 	return {
 		id: product._id.toString(),
@@ -8,7 +10,7 @@ export const mapProduct = (product) => {
 		category: product.category,
 		price: product.price,
 		content: product.content,
-		reviews: product.reviews,
+		reviews: (product.reviews || []).map(mapReview),
 		description: product.description,
 	}
 }

@@ -27,29 +27,35 @@ productRouter.get('/', async (req, res) => {
 })
 
 productRouter.get('/:id', async (req, res) => {
-	const product = await getProduct(req.params.id)
+	const product = await getProduct(req.params.id).populate('reviews')
 	res.send({ data: mapProduct(product) })
 })
 
 productRouter.post('/:id/reviews', async (req, res) => {
 	const newReview = await addReview(req.params.id, {
-		content: req.body.content,
-		author: req.user.id,
+		author: req.body.userLogin,
+		rating: req.body.rating,
+		content: req.body.reviewValue,
+		publishedAt: req.body.reviewDate
 	})
 
-	res.send({ data: mapReview(newReview) })
+	res.send({ review: mapReview(newReview) })
 })
 
 productRouter.delete(
-	'/:productId/reviews/:reviewId',
-	authenticated,
-	hasRole([ROLES.ADMIN]),
-	async (req, res) => {
-		await removeReview(req.params.productId, req.params.reviewId)
+  '/:productId/reviews/:reviewId',
+  authenticated,
+  hasRole([ROLES.ADMIN]),
+  async (req, res) => {
+    const deletedReviewId = await removeReview(
+      req.params.productId,
+      req.params.reviewId
+    )
 
-		res.send({ error: null })
-	},
+    res.send({ deletedReviewId })
+  }
 )
+
 
 productRouter.post('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const newProduct = await addProduct({
