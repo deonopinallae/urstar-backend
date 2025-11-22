@@ -12,5 +12,6 @@ export const mapProduct = (product) => {
 		content: product.content,
 		reviews: (product.reviews || []).map(mapReview),
 		description: product.description,
+		size: product.size
 	}
 }

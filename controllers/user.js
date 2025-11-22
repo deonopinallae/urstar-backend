@@ -1,9 +1,14 @@
 import bcrypt from 'bcrypt'
 import { ROLES } from '../constants/roles.js'
-import { Product, User } from '../models/index.js'
-import { generateToken, mapOutfit, mapProduct, mapUser } from '../helpers/index.js'
+import { Product, User, Outfit } from '../models/index.js'
+import {
+	generateToken,
+	mapOutfit,
+	mapProduct,
+	mapUser,
+	mapProductInCart,
+} from '../helpers/index.js'
 import mongoose from 'mongoose'
-import { Outfit } from '../models/Outfit.js'
 
 //register
 export const register = async (login, password, registeredAt) => {
@@ -66,18 +71,6 @@ export const deleteUser = (id) => {
 //edit (roles)
 export const updateUser = (id, userData) => {
 	return User.findByIdAndUpdate(id, userData, { returnDocument: 'after' })
-}
-
-//get user products in cart
-export const getUserCart = (userId) => {
-	const user = User.findById(userId)
-	return user.inCart
-}
-
-//add product to cart
-export const addProductInCart = async (userId, productData) => {
-	await User.findByIdAndUpdate(userId, { $push: { inCart: productData } })
-	return productData
 }
 
 //add product to combiner
@@ -173,8 +166,35 @@ export const deleteOutfit = async (userId, outfitId) => {
 		{ new: true },
 	).populate('outfits')
 
-	if (!updatedUser) throw new Error('User not found')
+	if (!updatedUser) throw new Error('user not found')
 
 	await Outfit.findByIdAndDelete(outfitId)
-
 }
+
+//add product to cart
+export const addProductToCart = async (userId, productData) => {
+	const product = await Product.findById(productData.product)
+	if (!product) throw new Error('product not found')
+
+	const user = await User.findByIdAndUpdate(
+		userId,
+		{ $addToSet: { cart: { product: product._id, size: productData.size } } },
+		{ new: true },
+	).populate('cart.product')
+
+	if (!user) throw new Error('user not found')
+
+	return {
+		...mapProduct(product),
+		size: productData.size,
+	}
+}
+
+//remove product from cart
+export const removeProductFromCart = async (userId, productId, size) => {
+	await User.findByIdAndUpdate(
+		userId,
+		{ $pull: { cart: { product: productId, size } } },
+		{ new: true },
+	)
+} 

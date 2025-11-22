@@ -1,4 +1,5 @@
 export * from './mapProduct.js'
+export * from './mapProductInCart.js'
 export * from './mapReview.js'
 export * from './mapOutfit.js'
 export * from './mapUser.js'

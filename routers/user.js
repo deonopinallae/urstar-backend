@@ -10,6 +10,8 @@ import {
 	deleteOutfit,
 	addProductToFavorites,
 	removeProductFromFavorites,
+	addProductToCart,
+	removeProductFromCart,
 } from '../controllers/index.js'
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapOutfit, mapProduct, mapUser } from '../helpers/index.js'
@@ -105,7 +107,7 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 		const { outfitData } = req.body
 		const userId = req.params.id
 		const outfit = await saveOutfit(userId, outfitData)
-		
+
 		res.send({ outfit })
 	} catch (error) {
 		console.error(error)
@@ -157,13 +159,42 @@ userRouter.delete('/:id/outfits/:outfitId', authenticated, async (req, res) => {
 	}
 })
 
+//remove product from cart
+userRouter.delete('/:id/cart/:productId', authenticated, async (req, res) => {
+	try {
+		const userId = req.params.id
+		const productId = req.params.productId
+		const { size } = req.body
+
+		await removeProductFromCart(userId, productId, size)
+		res.send({ productId, size })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+//add product to cart
+userRouter.post('/:id/cart', authenticated, async (req, res) => {
+	try {
+		const { productData } = req.body
+		const userId = req.params.id
+		const addedProduct = await addProductToCart(userId, productData)
+
+		res.send({ addedProduct })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
 //get user
 userRouter.get('/:id', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id)
 			.populate('combinerProducts')
 			.populate('outfits')
-			.populate('cart')
+			.populate('cart.product')
 			.populate('favorites')
 		res.send({ data: mapUser(user) })
 	} catch (error) {
