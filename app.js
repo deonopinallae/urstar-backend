@@ -3,23 +3,25 @@ import mongoose from 'mongoose'
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import router from './routers/index.js'
-import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const app = express()
+const port = 3001
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 
 config()
 
-const port = 3001
-const app = express()
 
-const corsOptions = {
-  origin: 'http://localhost:5137', 
-  credentials: true,
-}
-app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api', router)
 app.use(express.static('../frontend/build'))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 mongoose.connect(process.env.DB_CONNECTION_STRING).then(() => {
 	app.listen(port, () => {

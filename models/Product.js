@@ -5,35 +5,37 @@ const ProductSchema = mongoose.Schema(
 	{
 		imageUrl: {
 			type: String,
-			required: true,
-			validate: {
-				validator: validator.isURL,
-				message: 'Image should be a valid url',
-			},
+			require: true
 		},
 		name: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		brand: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		type: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		category: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		price: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		description: {
 			type: String,
-			required: true,
+			require: true
+
 		},
 		reviews: [{
 			type: mongoose.Schema.Types.ObjectId,

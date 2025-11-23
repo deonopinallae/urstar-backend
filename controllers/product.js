@@ -3,7 +3,7 @@ import { Product } from '../models/index.js'
 //add
 export const addProduct = async (product) => {
 	const newProduct = await Product.create(product)
-	await newProduct.populate({ path: 'reviews', populate: 'author' })
+	await newProduct.populate('reviews')
 	return newProduct
 }
 
@@ -12,12 +12,12 @@ export const editProduct = async (id, product) => {
 	const newProduct = await Product.findByIdAndUpdate(id, product, {
 		returnDocument: 'after',
 	})
-	await newProduct.populate({ path: 'reviews', populate: 'author' })
+	await newProduct.populate('reviews')
 	return newProduct
 }
 
 //delete
-export const deleteProduct = (id) => Product.deleteOne({ _id: id })
+export const deleteProduct = async (id) => await Product.deleteOne({ _id: id })
 
 //get list with search and pag
 export const getProducts = async () => {
