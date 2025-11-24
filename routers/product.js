@@ -94,21 +94,14 @@ productRouter.patch(
 	cloudUpload.single('image'),
 	async (req, res) => {
 		try {
-			const imageUrl = req.file ? req.file.path : req.body.imageUrl
-
-			const updatedProduct = await editProduct(req.params.id, {
-				imageUrl,
-				name: req.body.name,
-				brand: req.body.brand,
-				price: req.body.price,
-				type: req.body.type,
-				category: req.body.category,
-				description: req.body.description,
-			})
-
-			return res.json({ data: mapProduct(updatedProduct) })
+			const updateData = {
+				...req.body,
+				imageUrl: req.file ? req.file.path : req.body.imageUrl,
+			}
+			const updatedProduct = await editProduct(req.params.id, updateData)
+			res.json({ data: mapProduct(updatedProduct) }) // обязательно возвращать JSON
 		} catch (e) {
-			return res.status(500).json({ error: e.message })
+			res.status(500).json({ error: e.message })
 		}
 	},
 )
