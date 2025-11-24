@@ -28,7 +28,7 @@ const storage = new CloudinaryStorage({
 	cloudinary,
 	params: { folder: 'products' },
 })
-export const upload = multer({ storage })
+export const cloudUpload = multer({ storage })
 
 productRouter.get('/', async (req, res) => {
 	try {
