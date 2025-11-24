@@ -59,7 +59,10 @@ productRouter.delete(
 	authenticated,
 	hasRole([ROLES.ADMIN]),
 	async (req, res) => {
-		const deletedReviewId = await removeReview(req.params.productId, req.params.reviewId)
+		const deletedReviewId = await removeReview(
+			req.params.productId,
+			req.params.reviewId,
+		)
 		res.send({ deletedReviewId })
 	},
 )
@@ -90,17 +93,23 @@ productRouter.patch(
 	hasRole([ROLES.ADMIN]),
 	cloudUpload.single('image'),
 	async (req, res) => {
-		const imageUrl = req.file ? req.file.path : req.body.imageUrl
-		const updatedProduct = await editProduct(req.params.id, {
-			imageUrl,
-			name: req.body.name,
-			brand: req.body.brand,
-			price: req.body.price,
-			type: req.body.type,
-			category: req.body.category,
-			description: req.body.description,
-		})
-		res.send({ data: mapProduct(updatedProduct) })
+		try {
+			const imageUrl = req.file ? req.file.path : req.body.imageUrl
+
+			const updatedProduct = await editProduct(req.params.id, {
+				imageUrl,
+				name: req.body.name,
+				brand: req.body.brand,
+				price: req.body.price,
+				type: req.body.type,
+				category: req.body.category,
+				description: req.body.description,
+			})
+
+			return res.json({ data: mapProduct(updatedProduct) })
+		} catch (e) {
+			return res.status(500).json({ error: e.message })
+		}
 	},
 )
 
