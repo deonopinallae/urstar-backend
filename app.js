@@ -20,7 +20,7 @@ app.use(express.json())
 
 app.use(
 	cors({
-		origin: 'https://имя-фронта-на-render.onrender.com',
+		origin: 'https://urstar.onrender.com',
 		credentials: true,
 	}),
 )
