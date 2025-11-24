@@ -40,7 +40,7 @@ export const login = async (login, password) => {
 		throw new Error('wrong password')
 	}
 
-	const token = generateToken({ id: user.id })
+	const token = generateToken({ id: user._id })
 	return { token, user: mapUser(user) }
 }
 
