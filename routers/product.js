@@ -95,11 +95,18 @@ productRouter.patch(
 	async (req, res) => {
 		try {
 			const updateData = {
-				...req.body,
+				name: req.body.name,
+				brand: req.body.brand,
+				price: req.body.price,
+				type: req.body.type,
+				category: req.body.category,
+				description: req.body.description,
 				imageUrl: req.file ? req.file.path : req.body.imageUrl,
 			}
+
 			const updatedProduct = await editProduct(req.params.id, updateData)
-			res.json({ data: mapProduct(updatedProduct) }) // обязательно возвращать JSON
+
+			res.status(200).json({ data: mapProduct(updatedProduct) })
 		} catch (e) {
 			res.status(500).json({ error: e.message })
 		}
