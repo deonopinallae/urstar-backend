@@ -5,22 +5,28 @@ import cookieParser from 'cookie-parser'
 import router from './routers/index.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import cors from 'cors'
 
 const app = express()
-const port = 3001
+const port = process.env.PORT || 3001
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-
 config()
-
 
 app.use(cookieParser())
 app.use(express.json())
 
+app.use(
+	cors({
+		origin: 'https://имя-фронта-на-render.onrender.com',
+		credentials: true,
+	}),
+)
+
 app.use('/api', router)
-app.use(express.static('../frontend/build'))
+// app.use(express.static('../frontend/build'))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 mongoose.connect(process.env.DB_CONNECTION_STRING).then(() => {
