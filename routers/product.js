@@ -64,9 +64,7 @@ productRouter.post(
 	async (req, res) => {
 		if (!req.file) return res.status(400).send({ error: 'Image is required' })
 
-		const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${
-			req.file.filename
-		}`
+		const imageUrl = `${process.env.BACKEND_URL}/uploads/${req.file.filename}`
 
 		const newProduct = await addProduct({
 			imageUrl,
@@ -90,7 +88,7 @@ productRouter.patch(
 	async (req, res) => {
 		try {
 			const imageUrl = req.file
-				? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+				? `${process.env.BACKEND_URL}/uploads/${req.file.filename}`
 				: req.body.imageUrl
 
 			const updatedProduct = await editProduct(req.params.id, {
