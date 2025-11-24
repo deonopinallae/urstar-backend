@@ -11,7 +11,6 @@ import {
 import { authenticated, hasRole } from '../middlewars/index.js'
 import { mapProduct, mapReview } from '../helpers/index.js'
 import { ROLES } from '../constants/roles.js'
-import { upload } from '../middlewars/upload.js'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import { v2 as cloudinary } from 'cloudinary'
 import multer from 'multer'
@@ -26,19 +25,17 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
 	cloudinary,
-	params: { folder: 'products' },
+	params: { folder: 'products', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
 })
-export const cloudUpload = multer({ storage })
+const cloudUpload = multer({ storage })
 
 productRouter.get('/', async (req, res) => {
 	try {
 		const { products } = await getProducts()
-		if (products.length === 0) {
-			throw new Error('no products')
-		}
-		res.send({ data: { products: products.map((product) => mapProduct(product)) } })
+		if (!products.length) throw new Error('no products')
+		res.send({ data: { products: products.map(mapProduct) } })
 	} catch (e) {
-		console.log(e.message)
+		res.status(500).send({ error: e.message })
 	}
 })
 
@@ -54,7 +51,6 @@ productRouter.post('/:id/reviews', async (req, res) => {
 		content: req.body.reviewValue,
 		publishedAt: req.body.reviewDate,
 	})
-
 	res.send({ review: mapReview(newReview) })
 })
 
@@ -63,11 +59,7 @@ productRouter.delete(
 	authenticated,
 	hasRole([ROLES.ADMIN]),
 	async (req, res) => {
-		const deletedReviewId = await removeReview(
-			req.params.productId,
-			req.params.reviewId,
-		)
-
+		const deletedReviewId = await removeReview(req.params.productId, req.params.reviewId)
 		res.send({ deletedReviewId })
 	},
 )
@@ -76,14 +68,11 @@ productRouter.post(
 	'/add-product',
 	authenticated,
 	hasRole([ROLES.ADMIN]),
-	upload.single('image'),
+	cloudUpload.single('image'),
 	async (req, res) => {
 		if (!req.file) return res.status(400).send({ error: 'Image is required' })
-
-		const imageUrl = `/uploads/${req.file.filename}`
-
 		const newProduct = await addProduct({
-			imageUrl,
+			imageUrl: req.file.path,
 			name: req.body.name,
 			brand: req.body.brand,
 			price: req.body.price,
@@ -91,7 +80,6 @@ productRouter.post(
 			category: req.body.category,
 			description: req.body.description,
 		})
-
 		res.send({ data: mapProduct(newProduct) })
 	},
 )
@@ -100,26 +88,19 @@ productRouter.patch(
 	'/:id/edit',
 	authenticated,
 	hasRole([ROLES.ADMIN]),
-	upload.single('image'),
+	cloudUpload.single('image'),
 	async (req, res) => {
-		try {
-			const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl
-
-			const updatedProduct = await editProduct(req.params.id, {
-				imageUrl,
-				name: req.body.name,
-				brand: req.body.brand,
-				price: req.body.price,
-				type: req.body.type,
-				category: req.body.category,
-				description: req.body.description,
-			})
-
-			res.send({ data: mapProduct(updatedProduct) })
-		} catch (e) {
-			console.error(e)
-			res.status(500).send({ error: e.message })
-		}
+		const imageUrl = req.file ? req.file.path : req.body.imageUrl
+		const updatedProduct = await editProduct(req.params.id, {
+			imageUrl,
+			name: req.body.name,
+			brand: req.body.brand,
+			price: req.body.price,
+			type: req.body.type,
+			category: req.body.category,
+			description: req.body.description,
+		})
+		res.send({ data: mapProduct(updatedProduct) })
 	},
 )
 
