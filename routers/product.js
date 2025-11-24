@@ -94,7 +94,20 @@ productRouter.patch(
 	cloudUpload.single('image'),
 	async (req, res) => {
 		try {
-			const updateData = { ...req.body }
+			const updateData = {}
+
+			const fields = [
+				'name',
+				'brand',
+				'price',
+				'type',
+				'category',
+				'description',
+				'imageUrl',
+			]
+			fields.forEach((field) => {
+				if (req.body[field]) updateData[field] = req.body[field]
+			})
 
 			if (req.file) updateData.imageUrl = req.file.path
 
