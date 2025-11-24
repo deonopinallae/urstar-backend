@@ -80,7 +80,7 @@ productRouter.post(
 	async (req, res) => {
 		if (!req.file) return res.status(400).send({ error: 'Image is required' })
 
-		const imageUrl = req.file.path
+		const imageUrl = `/uploads/${req.file.filename}`
 
 		const newProduct = await addProduct({
 			imageUrl,
@@ -103,7 +103,7 @@ productRouter.patch(
 	upload.single('image'),
 	async (req, res) => {
 		try {
-			const imageUrl = req.file ? req.file.path : req.body.imageUrl
+			const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl
 
 			const updatedProduct = await editProduct(req.params.id, {
 				imageUrl,
