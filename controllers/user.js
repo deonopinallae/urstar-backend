@@ -17,7 +17,7 @@ export const register = async (login, password, registeredAt) => {
 	}
 	const passwordHash = await bcrypt.hash(password, 10)
 	const user = await User.create({ login, password: passwordHash, registeredAt })
-	const token = generateToken({ id: user.id })
+	const token = generateToken({ id: user._id })
 
 	return { user, token }
 }

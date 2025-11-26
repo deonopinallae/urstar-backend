@@ -2,7 +2,7 @@ import { verify } from '../helpers/index.js'
 import { User } from '../models/index.js'
 
 export const authenticated = async (req, res, next) => {
-	const token = req.headers.authorization?.split(' ')[1]
+	const token = req.cookies.token
 	if (!token) return res.status(401).json({ error: 'JWT must be provided' })
 
 	try {
