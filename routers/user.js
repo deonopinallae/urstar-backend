@@ -23,7 +23,6 @@ export const userRouter = express.Router({ mergeParams: true })
 //get users
 userRouter.get('/', authenticated, hasRole([ROLES.ADMIN]), async (req, res) => {
 	const users = await getUsers()
-
 	res.send({ data: users.map(mapUser) })
 })
 
@@ -119,8 +118,9 @@ userRouter.post('/:id/outfits', authenticated, async (req, res) => {
 userRouter.get('/:id/outfits', authenticated, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id).populate('outfits')
+		const outfits = user.outfits.map((outfit) => mapOutfit(outfit))
 
-		res.send({ data: user.outfits })
+		res.send({ data: outfits})
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: error.message })
