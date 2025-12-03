@@ -12,8 +12,7 @@ export const editProduct = async (id, product) => {
 	const newProduct = await Product.findByIdAndUpdate(id, product, {
 		returnDocument: 'after',
 		runValidators: true,
-	})
-	await newProduct.populate('reviews')
+	}).populate('reviews')
 	return newProduct
 }
 

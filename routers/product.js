@@ -111,11 +111,11 @@ productRouter.patch(
 
 			if (req.file) updateData.imageUrl = req.file.path
 
-			const updatedProduct = await editProduct(req.params.id, updateData)
-
-			res.status(200).json({ data: mapProduct(updatedProduct) })
+			const updatedProductData = await editProduct(req.params.id, updateData)
+			console.log(mapProduct(updatedProductData))
+			res.send({ updatedProduct: mapProduct(updatedProductData) })
 		} catch (e) {
-			res.status(500).json({ error: e.message })
+			res.send({ error: e.message })
 		}
 	},
 )

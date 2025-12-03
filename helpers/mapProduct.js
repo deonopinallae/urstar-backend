@@ -9,9 +9,8 @@ export const mapProduct = (product) => {
 		type: product.type,
 		category: product.category,
 		price: product.price,
-		content: product.content,
 		reviews: (product.reviews || []).map(mapReview),
 		description: product.description,
-		size: product.size
+		size: product.size || 'no size'
 	}
 }
