@@ -1,21 +1,33 @@
-URSTAR — backend
+# URSTAR — Backend
+---
 REST API для маркетплейса одежды: пользователи, продукты, образы (outfits), отзывы, корзина, аутентификация и роль‑базированный доступ.
-Стек: Node.js, Express, Mongoose (MongoDB), JWT, bcrypt, multer, multer-storage-cloudinary, dotenv, cookie‑parser, cors.
 
-Структура папок:
-routers/ — маршруты API (под префиксом /api).
-controllers/ — обработчики логики запросов.
-models/ — Mongoose‑модели: User, Product, Outfit, Review.
-middleware/ — аутентификация, проверка ролей, загрузка файлов.
-helpers/ — вспомогательные функции и мапперы.
-uploads/ — временное/локальное хранение файлов (статические файлы доступны по /uploads).
+Роль
+---
+Проектирование и реализация серверной части, API, моделей данных, middleware и интеграции облачного хранения медиа.
 
-Основные API:
-POST /api/auth/register — регистрация.
-POST /api/auth/login — вход, выдача JWT и/или cookie.
-GET /api/products — список продуктов (фильтрация, пагинация).
-POST /api/products — создание продукта (роль admin).
-PUT/DELETE /api/products/:id — редактирование/удаление продукта (role‑based).
-POST /api/outfits — создать outfit.
-GET /api/users/:id — профиль пользователя.
-POST /api/reviews — оставить отзыв.
+Стек
+---
+- Node.js, Express
+- MongoDB, Mongoose
+- JWT, bcrypt (аутентификация)
+- multer, multer-storage-cloudinary (загрузка медиа)
+- dotenv, cookie-parser, cors
+
+Структура (кратко)
+---
+- `routers/` — маршруты API (префикс `/api`)
+- `controllers/` — логика обработчиков
+- `models/` — Mongoose‑схемы (`User`, `Product`, `Outfit`, `Review`)
+- `middleware/` — аутентификация, проверка ролей, загрузка файлов
+- `helpers/` — утилиты и мапперы данных
+- `uploads/` — локальные статические файлы (доступны по `/uploads`)
+
+Основные эндпоинты
+---
+- `POST /api/auth/register` — регистрация
+- `POST /api/auth/login` — вход (JWT / cookie)
+- `GET /api/products` — список продуктов (фильтрация, пагинация)
+- `POST /api/products` — создать продукт (admin)
+- `POST /api/outfits` — создать outfit
+- `POST /api/reviews` — оставить отзыв
